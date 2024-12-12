@@ -62,16 +62,24 @@ server.listen(process.env.PORT, () => {
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  io.on("new-user", (data) => {
+  socket.on("new-user", (data) => {
     const channel = client.channels.cache.get("1316805882117492747");
-    channel.send(`${data.name} just joined Medvive! 🥳`);
+    if (channel) {
+      channel.send(`${data.name} just joined Medvive! 🥳`).catch(err => console.error("Failed to send message:", err));
+    } else {
+      console.error("Channel not found for new user message.");
+    }
   });
 
-  io.on("new-consultation", (data) => {
+  socket.on("new-consultation", (data) => {
     const channel = client.channels.cache.get("1316810844050292870");
-    channel.send(
-      `${data.name} just scheduled a consultation with Dr. ${data.doctor.name} on ${data.date}. 🥳`
-    );
+    if (channel) {
+      channel.send(
+        `${data.name} just scheduled a consultation with Dr. ${data.doctor.name} on ${data.date}. 🥳`
+      ).catch(err => console.error("Failed to send message:", err));
+    } else {
+      console.error("Channel not found for new consultation message.");
+    }
   });
 
   // Handle socket events here
