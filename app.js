@@ -65,7 +65,9 @@ io.on("connection", (socket) => {
   socket.on("new-user", (data) => {
     const channel = client.channels.cache.get("1316805882117492747");
     if (channel) {
-      channel.send(`${data.name} just joined Medvive! 🥳`).catch(err => console.error("Failed to send message:", err));
+      channel
+        .send(`${data.name} just joined Medvive! 🥳`)
+        .catch((err) => console.error("Failed to send message:", err));
     } else {
       console.error("Channel not found for new user message.");
     }
@@ -74,9 +76,17 @@ io.on("connection", (socket) => {
   socket.on("new-consultation", (data) => {
     const channel = client.channels.cache.get("1316810844050292870");
     if (channel) {
-      channel.send(
-        `${data.name} just scheduled a consultation with Dr. ${data.doctor.name} on ${data.date}. 🥳`
-      ).catch(err => console.error("Failed to send message:", err));
+      if (data?.doctor?.name && data?.name) {
+        channel
+          .send(
+            `${data?.name} just scheduled a consultation with Dr. ${data?.doctor?.name} on ${data.date}. 🥳`
+          )
+          .catch((err) => console.error("Failed to send message:", err));
+      } else {
+        channel
+          .send(JSON.stringify(data))
+          .catch((err) => console.error("Failed to send message:", err));
+      }
     } else {
       console.error("Channel not found for new consultation message.");
     }
